@@ -1,0 +1,18 @@
+# Generic ROS 1 live stream — copy and set topics/frames/intrinsics for your robot.
+# Pose comes from the TF tree (world_frame -> camera_frame).
+parent: configs/quality/live.yaml
+dataset_type: "ros"
+vertical_axis: 2
+
+ros1_color_topic: "/camera/color/image_raw"
+ros1_depth_topic: "/camera/aligned_depth_to_color/image_raw"
+ros1_world_frame: "map"
+ros1_camera_frame: "camera_color_optical_frame"
+# ROS 1 has no camera_info subscription — set per camera (K: fx=K[0] fy=K[4] cx=K[2] cy=K[5])
+ros1_fx: 615.0
+ros1_fy: 615.0
+ros1_cx: 320.0
+ros1_cy: 240.0
+
+source_path: "live/ros1_online"
+save_path: "output/ros1_online"

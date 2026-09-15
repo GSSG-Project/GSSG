@@ -1,0 +1,55 @@
+# Jetson AGX Orin (aarch64 / JetPack 6.x, CUDA 12.6, sm_87) conda environment.
+# torch, torchvision, open3d, cuSPARSELt are installed SEPARATELY — see JETSON_INSTALL.md.
+# Do NOT add torch/torchvision/torchaudio here; the Jetson torch wheel must be pip-installed by hand.
+name: gssg
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - gxx_linux-aarch64   # installs a newer GCC — overridden by CC/CXX (system gcc 11) in the activation script
+  - cmake
+  - make
+  - ninja
+  - pkg-config
+  - python=3.10         # must match the Jetson torch wheel (cp310)
+  - pip
+  - tqdm
+
+  - pip:
+      # The Jetson torch wheel (nv24.08) is compiled against NumPy 1.x. Pin the
+      # whole scientific stack to numpy-1.x-built versions, otherwise pip pulls
+      # numpy-2-ABI wheels (opencv >=4.10, scipy >=1.12) that fail at runtime with
+      # "src is not a numpy array" / "All ufuncs must have type numpy.ufunc".
+      - numpy==1.26.4
+      - scipy==1.11.4          # 1.12+ aarch64 wheels are built against numpy 2
+      - opencv-python==4.9.0.80 # 4.10+ aarch64 wheels are built against numpy 2
+      - faiss-cpu==1.8.0.post1 # 1.9+ aarch64 wheels are numpy-2 ABI; breaks index pickling for mp spawn
+      - shapely==2.0.1         # 2.0.4+ aarch64 wheels are numpy-2 ABI; RecursionError in room_segmenter
+      - setuptools==69.5.1     # newer setuptools breaks the torchvision source build
+      - tensorboard
+      - einops
+      - matplotlib
+      - pycocotools
+      - psutil
+      - pytorch_msssim
+      - trimesh
+      - scikit-image
+      - pyyaml
+      - GPUtil
+      - Pillow
+      - plyfile
+      - huggingface-hub==0.36.0
+      - rtree
+      - ultralytics
+      - rerun-sdk
+      - torchmetrics
+      - fastapi
+      - langchain
+      - langchain-google-genai
+      # torch, torchvision, open3d: installed separately (see JETSON_INSTALL.md)
+      # torchaudio: DO NOT install — pulls in vanilla torch and breaks the Jetson wheel
+      # decord: no aarch64 wheel — skip (only used by sam3 training notebooks)
+      # BestSAM backend (seg_model: bestsam) needs transformers + a newer hub. Install
+      # those by hand (--no-deps, to keep numpy 1.26.4) per JETSON_INSTALL.md:
+      #   pip install --no-deps transformers==5.0.0rc1 && pip install tokenizers huggingface_hub==1.2.1 --no-deps
+      # Not listed above so a plain `conda env create` keeps the numpy-1.x base intact.

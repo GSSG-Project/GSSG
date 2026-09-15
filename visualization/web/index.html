@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en" data-theme="night">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ATLAS · GSSG Perception</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="/src/styles.css?v=2" />
+
+    <!-- Resolve the bare `playcanvas` import without a build step. Modern
+         browsers (Chrome 89+, Firefox 108+, Safari 16.4+) support importmap
+         natively. -->
+    <script type="importmap">
+      {
+        "imports": {
+          "playcanvas": "https://esm.sh/playcanvas@2.18.0"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js?v=6"></script>
+  </body>
+</html>

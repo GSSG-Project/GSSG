@@ -1,0 +1,9 @@
+[submodule "thirdparty/mobileclip"]
+	path = thirdparty/mobileclip
+	url = https://github.com/apple/ml-mobileclip.git
+[submodule "thirdparty/sam3"]
+	path = thirdparty/sam3
+	url = https://github.com/facebookresearch/sam3.git
+[submodule "thirdparty/pytorch3d"]
+	path = thirdparty/pytorch3d
+	url = https://github.com/facebookresearch/pytorch3d.git

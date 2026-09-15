@@ -1,0 +1,7 @@
+parent: configs/quality/high.yaml
+dataset_type: "replica"        # CLIO uses the Replica file layout
+frame_step: 2
+frame_max: 100
+
+source_path: data/clio/cubicle
+save_path: output/clio_cubicle

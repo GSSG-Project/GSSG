@@ -1,0 +1,89 @@
+GSSG — Research-Only (Non-Commercial) License
+=============================================
+
+Copyright (C) 2024-2026, the GSSG authors. All rights reserved.
+
+GSSG ("the Software") is a semantic-aware 3D Gaussian Splatting SLAM
+system built on top of RTG-SLAM (https://github.com/MisEty/RTG-SLAM), which is
+itself derived from the 3D Gaussian Splatting software developed by Inria and the
+Max Planck Institut fuer Informatik (MPII). Portions of the Software are
+distributed under, and remain subject to, the Inria Gaussian-Splatting License
+and the licenses of the other third-party components listed in
+docs/THIRD_PARTY_LICENSES.md. This top-level license governs the first-party code in
+this repository and DOES NOT relax any restriction imposed by those upstream
+licenses.
+
+Because the Software incorporates and depends on third-party components licensed
+for non-commercial research use only — most notably the Inria/MPII
+Gaussian-Splatting rasterizer in thirdparty/gaussian-rasterizer (together with
+simple-knn and cuda-utils), the Apple MobileCLIP model weights, and the AGPL-3.0
+FastSAM/Ultralytics backend — the Software as a whole is made available for
+NON-COMMERCIAL, ACADEMIC, AND RESEARCH USE ONLY.
+
+1. Definitions
+   "Licensee" or "you" means any person or entity that uses the Software or
+   distributes a Work based on it.
+   "Work" means the Software and any additions to or derivative works of the
+   Software.
+
+2. Grant of rights
+   Subject to the terms and limitations below, you are granted a non-exclusive,
+   royalty-free, non-sublicensable, non-transferable license to use, reproduce,
+   prepare derivative works of, publicly display, publicly perform, and
+   distribute the Work, solely for academic, research, evaluation, and other
+   NON-COMMERCIAL purposes.
+
+3. Non-commercial use only
+   COMMERCIAL USE OF THE SOFTWARE IS STRICTLY PROHIBITED. "Commercial use"
+   includes, without limitation, use in or for a product or service that is
+   sold, licensed, or otherwise offered for a fee or other consideration; use
+   on behalf of or for the benefit of a for-profit enterprise's commercial
+   activities; and use to generate revenue. The authors cannot grant rights
+   they do not hold: commercial licensing of the upstream Gaussian-Splatting
+   components must be arranged directly with Inria
+   (stip-sophia.transfert@inria.fr); commercial use of the FastSAM backend
+   requires an Ultralytics Enterprise License; and the Apple MobileCLIP weights
+   are licensed for Research Purposes only.
+
+4. Redistribution
+   You may reproduce or distribute the Work only if you (a) do so under this
+   License, (b) include a complete copy of this License and of
+   THIRD_PARTY_LICENSES.md with your distribution, and (c) retain without
+   modification all copyright, patent, trademark, and attribution notices
+   present in the Work — including the Inria/GRAPHDECO headers in gssg/utils/*
+   and gssg/dataset_reader/* and the PlenOctree header in gssg/utils/sh_utils.py.
+
+5. Third-party components
+   Your use of the components vendored under thirdparty/ and of the runtime
+   dependencies described in THIRD_PARTY_LICENSES.md is governed by their
+   respective licenses, which are reproduced or referenced in that file. In the
+   event of any conflict between this License and a third-party license, the
+   MORE RESTRICTIVE terms apply to the affected component. Nothing in this
+   License overrides the Inria Gaussian-Splatting License, the AGPL-3.0 terms of
+   FastSAM/Ultralytics, the Meta SAM 3 License (including its Acceptable Use
+   Policy and Trade Control terms), or the Apple MobileCLIP license terms.
+
+6. No trademark or endorsement
+   This License does not grant permission to use the trade names, trademarks,
+   service marks, or product names of Inria, MPII, Meta, Apple, Ultralytics, or
+   any contributor, except as required for reasonable and customary use in
+   describing the origin of the Software and reproducing notice files.
+
+7. Citation
+   If you use the Software for a publication or other results, you are strongly
+   encouraged to cite the corresponding publications, including RTG-SLAM and the
+   original 3D Gaussian Splatting work, as well as any third-party model you
+   enable (SAM 3, FastSAM, MobileCLIP, open_clip).
+
+8. Disclaimer of warranty and limitation of liability
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+For inquiries regarding commercial licensing of the upstream Gaussian-Splatting
+components, contact Inria: stip-sophia.transfert@inria.fr. See
+THIRD_PARTY_LICENSES.md for the full list of components and their licenses.

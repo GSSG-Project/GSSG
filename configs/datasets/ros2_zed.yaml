@@ -1,0 +1,21 @@
+# Live ZED over ROS 2 (run_mp). Poses from ZED SDK odometry.
+parent: configs/quality/live.yaml
+dataset_type: "ros2"
+vertical_axis: 2
+
+ros2_pose_topic: "/zed/zed_node/odom"
+ros2_world_frame: "odom"
+ros2_camera_frame: "zed_left_camera_frame_optical"
+ros2_color_topic: "/zed/zed_node/rgb/color/rect/image"
+ros2_depth_topic: "/zed/zed_node/depth/depth_registered"
+ros2_camera_info_topic: "/zed/zed_node/rgb/color/rect/camera_info"
+
+ros2_pose_cov_max: 0.05        # skip frames with position-cov trace above this (m^2); 0 = off
+
+# real-time intake: never stall the camera
+sync_tracker2mapper_method: free
+mapper_queue_maxsize: 3
+mapper_watchdog_ms: 500
+
+source_path: "live/ros2_zed"
+save_path: "output/ros2_zed"

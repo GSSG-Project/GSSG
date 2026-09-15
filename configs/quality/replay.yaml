@@ -1,0 +1,8 @@
+# Offline replay of a live stream (bag/SVO): no real-time cap, heavy hole-fill.
+parent: configs/quality/live.yaml
+
+optimize_budget_ms: 0
+gaussian_update_iter: 30
+uniform_sample_num: 6000
+transmission_sample_ratio: 2.0
+final_global_iter: 400

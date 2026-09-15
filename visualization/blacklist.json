@@ -1,0 +1,3 @@
+{
+  "_comment": "Per-scene object id blacklist. Blacklisted ids are stripped from the scene graph at load time, so they're invisible to the viewer, scene-graph panel, CLIP query, and LLM agent tools alike. Edit and reload the active scene (re-select it in the dropdown / POST /api/scenes/select) or restart the server to apply changes."
+}

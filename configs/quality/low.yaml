@@ -1,0 +1,29 @@
+# Fast / preview quality (Jetson, quick iteration). Uniform sampling, fewest iters.
+parent: configs/base.yaml
+
+sampling_version: 2
+uniform_sample_num: 1500
+gaussian_update_iter: 5
+gaussian_update_frame: 5
+seed_filter_mode: "grid"        # voxel-hash seed filter ("knn" = legacy pytorch3d, ~10-30x slower)
+adaptive_optimize: True         # scale optimize iters by frame novelty (low-novelty frames -> fewer)
+adaptive_min_iter_ratio: 0.4    # iteration floor as a fraction of gaussian_update_iter
+memory_length: 8
+stable_confidence_thres: 5
+unstable_time_window: 9999
+active_sh_degree: 0
+final_global_iter: 30
+keyframe_trans_thres: 0.3       # m
+keyframe_theta_thres: 0.3       # RADIANS
+scale_factor: 0.75
+max_radius: 0.02
+opacity_lr: 0.0
+color_weight: 0.8
+ssim_weight: 0.2
+add_depth_thres: 0.1
+add_color_thres: 0.1
+seg_model: "bestsam"
+clip_model: "MobileCLIP2-S0"
+clip_mask_blur: False
+visualize: False
+verbose: False

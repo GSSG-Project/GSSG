@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+# gssg-run — one entrypoint that knows how to start GSSG correctly on this machine.
+#
+# It resolves the per-box bits that otherwise bite you — the conda env, the installed
+# ROS 2 distro, the repo on PYTHONPATH, the right segmentation engine — so the same
+# command works on a desktop and on a Jetson. Per-machine overrides live in .env.local
+# (copy .env.example); nothing there is required.
+#
+#   ./bin/gssg-run                 # interactive wizard: input type, quality, viewer…
+#   ./bin/gssg-run <profile> [--quality low|mid|high] [--mp|--single] [--no-ros] [-- ARGS...]
+#   ./bin/gssg-run doctor          # print an environment report and exit
+#
+# <profile> is an alias (zed, replica, ros2) or a config name/path under configs/.
+# Anything after `--` (or any unrecognized flag) is passed straight to the Python runner.
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
+[[ -f "$REPO_ROOT/.env.local" ]] && source "$REPO_ROOT/.env.local"
+
+log()  { printf '\033[36m[gssg-run]\033[0m %s\n' "$*" >&2; }
+die()  { printf '\033[31m[gssg-run] error:\033[0m %s\n' "$*" >&2; exit 1; }
+
+usage() {
+  awk 'NR>1 && /^#/ {sub(/^# ?/, ""); print; next} NR>1 {exit}' "${BASH_SOURCE[0]}"
+}
+
+activate_conda() {
+  [[ -n "${GSSG_CONDA_ENV:-}" ]] || return 0
+  [[ "${CONDA_DEFAULT_ENV:-}" == "$GSSG_CONDA_ENV" ]] && return 0
+  local sh="${GSSG_CONDA_SH:-}"
+  [[ -z "$sh" ]] && command -v conda >/dev/null && sh="$(conda info --base)/etc/profile.d/conda.sh"
+  [[ -f "$sh" ]] || die "GSSG_CONDA_ENV=$GSSG_CONDA_ENV set but conda not found (set GSSG_CONDA_SH in .env.local)"
+  set +u  # conda activate.d hooks (e.g. cuda-nvcc's) read unset vars under `set -u`
+  # shellcheck disable=SC1090
+  source "$sh"
+  conda activate "$GSSG_CONDA_ENV"
+  set -u
+  log "conda env: $GSSG_CONDA_ENV"
+}
+
+source_ros() {
+  local distro="${ROS_DISTRO:-}"
+  if [[ -z "$distro" || ! -f "/opt/ros/$distro/setup.bash" ]]; then
+    distro="$(ls -1 /opt/ros 2>/dev/null | grep -vE '^_' | tail -1 || true)"
+  fi
+  [[ -n "$distro" && -f "/opt/ros/$distro/setup.bash" ]] || { log "no ROS 2 under /opt/ros (skipping)"; return 0; }
+  set +u  # ROS setup.bash reads unset vars under `set -u`
+  source "/opt/ros/$distro/setup.bash"
+  [[ -n "${GSSG_ROS_WS:-}" && -f "${GSSG_ROS_WS}/setup.bash" ]] && source "${GSSG_ROS_WS}/setup.bash"
+  set -u
+  log "ROS 2: $distro${GSSG_ROS_WS:+ + $GSSG_ROS_WS}"
+}
+
+# Running a script BY PATH puts the script's dir (gssg/) on sys.path, not the repo root —
+# so `python gssg/run_mp.py` can't `import gssg` unless the package is installed. Prepend
+# the repo unconditionally (a no-op if it's also pip-installed) so the launch works either
+# way. find_spec only validates; it doesn't pay torch import time.
+ensure_importable() {
+  export PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}"
+  python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('gssg') else 1)" 2>/dev/null \
+    || die "cannot import gssg from $REPO_ROOT (is the right conda env active?)"
+}
+
+doctor() {
+  activate_conda
+  source_ros
+  ensure_importable
+  log "repo:        $REPO_ROOT"
+  log "python:      $(command -v python)  ($(python --version 2>&1))"
+  log "conda env:   ${CONDA_DEFAULT_ENV:-<none>}"
+  log "checkpoints: ${GSSG_CHECKPOINTS:-$REPO_ROOT/checkpoints}"
+  python - <<'PY'
+from gssg.utils.platform import describe
+d = describe()
+print(f"[gssg-run] machine:     {d['machine']}  (jetson={d['is_jetson']})")
+print(f"[gssg-run] tensorrt:    {d['tensorrt']}")
+print(f"[gssg-run] bestsam:     {d['engines'] or 'no engines built (will use sam3)'}")
+PY
+  exit 0
+}
+
+# No args, or `new`/`wizard`: the interactive run wizard (asks input type,
+# quality, viewer, sub-mapping → writes a config → launches). Needs gssg importable only.
+run_wizard() { ensure_importable; exec python -m gssg.cli.wizard; }
+[[ $# -ge 1 ]] || run_wizard
+case "$1" in
+  -h|--help)   usage; exit 0 ;;
+  doctor)      doctor ;;
+  new|wizard)  run_wizard ;;
+esac
+
+PROFILE="$1"; shift
+QUALITY=""; RUNNER=""; NO_ROS=0; PASS=()
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --quality) QUALITY="${2:?--quality needs a value}"; shift 2 ;;
+    --mp)      RUNNER="run_mp.py"; shift ;;
+    --single)  RUNNER="run.py"; shift ;;
+    --no-ros)  NO_ROS=1; shift ;;
+    --)        shift; PASS+=("$@"); break ;;
+    *)         PASS+=("$1"); shift ;;
+  esac
+done
+
+# Profile -> config + sensible defaults (flags above always win).
+CONFIG=""; DEF_RUNNER="run.py"; DEF_QUALITY=""
+case "$PROFILE" in
+  zed)                    CONFIG="configs/datasets/ros2_zed.yaml";             DEF_RUNNER="run_mp.py" ;;
+  ros2|online)            CONFIG="configs/datasets/ros2_online.yaml";          DEF_RUNNER="run_mp.py" ;;
+  replica)                CONFIG="configs/datasets/replica.yaml" ;;
+  *)
+    for c in "$PROFILE" "configs/datasets/$PROFILE.yaml" "configs/$PROFILE.yaml" "$PROFILE.yaml"; do
+      [[ -f "$c" ]] && { CONFIG="$c"; break; }
+    done
+    [[ -n "$CONFIG" ]] || die "unknown profile/config '$PROFILE' (try: zed, replica, a configs/ path, or 'doctor')"
+    ;;
+esac
+[[ -f "$CONFIG" ]] || die "config not found: $CONFIG"
+
+RUNNER="${RUNNER:-$DEF_RUNNER}"
+QUALITY="${QUALITY:-$DEF_QUALITY}"
+
+activate_conda
+[[ "$NO_ROS" -eq 1 ]] || source_ros
+ensure_importable
+
+CMD=(python "gssg/$RUNNER" --config "$CONFIG")
+[[ -n "$QUALITY" ]] && CMD+=(--quality "$QUALITY")
+[[ ${#PASS[@]} -gt 0 ]] && CMD+=("${PASS[@]}")
+log "launch: ${CMD[*]}"
+exec "${CMD[@]}"

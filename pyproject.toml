@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gssg"
+version = "0.1.0"
+description = "GSSG: semantic-aware 3D Gaussian Splatting SLAM with a queryable scene graph"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Research-Only (Non-Commercial); see LICENSE" }
+
+# Runtime deps are NOT listed here: the CUDA/torch stack plus the editable
+# thirdparty packages (simple-knn, gaussian-rasterizer, cuda-utils, pytorch3d,
+# mobileclip, sam3) are installed via the conda environment files. `pip install -e .`
+# only puts the `gssg` package on the path so `from gssg...` resolves from any CWD.
+
+[tool.setuptools.packages.find]
+include = ["gssg*"]
+exclude = ["thirdparty*", "visualization*", "configs*", "output*", "data*"]
+
+[tool.ruff]
+line-length = 100
+exclude = ["thirdparty", "output", "data"]
+
+[tool.ruff.lint]
+# E/F = pyflakes+pycodestyle, I = import sorting, UP = pyupgrade, B = bugbear
+select = ["E", "F", "I", "UP", "B"]
+
+[tool.ruff.format]
+quote-style = "double"

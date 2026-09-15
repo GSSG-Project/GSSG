@@ -1,0 +1,113 @@
+# Constant across every run. Speed/quality dials live in configs/quality/*,
+# input/scene knobs in configs/datasets/*. Do not add tuning dials here.
+parent: "None"
+
+# Infra / logging
+device_list: [0]
+gpu_device: "cuda"
+processing_mode: "single"       # single | multi
+quiet: False
+log_level: "WARNING"            # INFO | WARNING | ERROR
+compile_renderer: False
+background_fusion: True
+use_tensorboard: True
+fps_log_every: 20
+use_keyframe: True
+save_step: 100
+
+# Dataset-format defaults (datasets override per sensor/scene)
+resolution: 1
+resolution_scales: [1.0]
+eval: False
+eval_llff: 2
+preload: False
+vertical_axis: 2               # 2 = Z-up (Replica/ROS), 1 = Y-up (HM3D)
+apply_view_transform: True     # False for optical-frame (ZED) captures
+filter_blur: False
+blur_filter_radius: 5
+full_render_frame: False
+frame_start: 0
+frame_step: 1
+frame_max: -1
+min_depth: 0.3
+max_depth: 6.0
+depth_filter: False
+
+# Semantics are always on (the on/off toggle was removed). Scene graph + SAM/CLIP +
+# vector DB + room segmentation always run alongside the geometry.
+# Object-fusion semantic gate. Blocks merging distinct adjacent objects on weak CLIP
+# overlap while keeping same-object merges. 0.8 is the value behind the published
+# OpenLex3D numbers and the paper's tau_sem (every benchmark config used 0.8; the old
+# 0.5 default over-merged adjacent objects into muddy embeddings).
+fusion_semantic_threshold: 0.8
+
+# Segmentation constants
+seg_min_area: 2500             # px^2
+seg_max_area: 450000           # px^2
+clip_checkpoint_path: null     # null = resolve mobileclip2_s0.pt via GSSG_CHECKPOINTS (gssg/utils/paths.py)
+clip_dim: 0                    # 0 = auto-detect from clip_model
+bestsam_engine_path: "thirdparty/bestsam/engines/bestsam_fp16_r560.plan"
+bestsam_prompt: "visible object"
+bestsam_score_threshold: 0.25
+bestsam_mask_threshold: 0.5
+
+# Room segmentation is self-calibrating (no knobs; it derives the floor band, wall map
+# and room count from the map itself). Only vertical_axis above and the method feed it.
+room_seg_method: "ours"        # ours | ours_v2 (splat-native) | hydra | hovsg (baselines)
+near_wall_threshold: 0.3       # m, object-near-wall fallback in scene graph assignment
+# Room-embedding quality gates: a frame contributes to a room's CLIP embedding only if
+# the camera stood inside the room, this far (m) from any wall (doorway frames straddle
+# two rooms), and a room needs this many contributing frames to get an embedding at all.
+room_embed_wall_margin: 0.3
+room_embed_min_frames: 5
+
+# Gaussian init
+max_sh_degree: 3
+xyz_factor: [1, 1, 0.1]
+init_opacity: 0.99
+min_radius: 0.0001
+
+# Map preprocessing
+invalid_confidence_thresh: 0.2
+global_keyframe_num: 3
+
+# Map params
+add_transmission_thres: 0.5
+transmission_sample_ratio: 1.0
+error_sample_ratio: 0.05
+
+# Objectness sampling weights w = M_conf^gamma + beta (gamma=0 = uniform sampling).
+# beta=0.1 from the gamma/beta ablation: fewest gaussians on both datasets and best
+# Replica S.
+# bg_scale_mult enlarges background (non-object) splats — the main gaussian saving
+# (~20% on room0). Object-centric mapping is v2-only: sampling_version 1 (or
+# gamma=0) forces bg_scale_mult to 1.0 and runs the semantics-blind baseline
+# (uniform sampling, plain L1 loss). Use v1 for uniform-baseline experiments.
+sample_gamma: 3.0
+sample_beta: 0.1
+bg_scale_mult: 1.5
+add_normal_thres: 1000
+history_merge_max_weight: 0.5
+frustum_cull_stable: True       # drop off-view stable gaussians per optimize-render → cost scales with visible, not total map
+rerun_log_step: 10              # log the full gaussian cloud to Rerun every N mapper frames (1 = every frame); higher avoids viewer backpressure stalls
+
+# Optimization: learning rates & coefficients
+position_lr: 0.001
+feature_lr: 0.0005
+scaling_lr: 0.004
+rotation_lr: 0.001
+feature_lr_coef: 4.0
+scaling_lr_coef: 4.0
+rotation_lr_coef: 4.0
+depth_weight: 1.0
+normal_weight: 0.0
+
+# Rendering
+renderer_opaque_threshold: 0.5
+renderer_normal_threshold: 60
+renderer_depth_threshold: 1.0
+color_sigma: 3.0
+
+# Tracker<->mapper sync
+sync_tracker2mapper_method: "strict"
+sync_tracker2mapper_frames: 5

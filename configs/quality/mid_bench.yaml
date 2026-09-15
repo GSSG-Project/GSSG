@@ -1,0 +1,33 @@
+# Benchmark-balanced quality: identical to mid.yaml, but the CLIP encoder is
+# swapped to ViT-H-14 (OpenCLIP laion2b_s32b_b79k, 1024-D) so predictions live
+# in the SAME space the OpenLex3D eval text-encodes its labels in. mid.yaml's
+# MobileCLIP2-S0 (512-D) is fast but unscorable against the benchmark.
+# Keeps mid's fast mapping (gaussian_update_iter 5, adaptive_optimize, bestsam).
+parent: configs/base.yaml
+
+sampling_version: 2
+uniform_sample_num: 3500
+gaussian_update_iter: 5
+gaussian_update_frame: 5
+seed_filter_mode: "grid"        # voxel-hash seed filter ("knn" = legacy pytorch3d, ~10-30x slower)
+adaptive_optimize: True        # scale optimize iters by frame novelty
+adaptive_min_iter_ratio: 0.4
+memory_length: 10
+stable_confidence_thres: 5
+unstable_time_window: 9999
+active_sh_degree: 0
+final_global_iter: 100
+keyframe_trans_thres: 0.3       # m
+keyframe_theta_thres: 0.3       # RADIANS
+scale_factor: 0.95
+max_radius: 0.02
+opacity_lr: 0.0
+color_weight: 0.7
+ssim_weight: 0.3
+add_depth_thres: 0.1
+add_color_thres: 0.1
+seg_model: "bestsam"
+clip_model: "ViT-H-14"          # CHANGED from MobileCLIP2-S0: 1024-D laion2b, matches OpenLex3D eval encoder
+clip_mask_blur: False
+visualize: True
+verbose: False

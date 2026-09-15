@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# gssg-render — render an MP4 flythrough of a finished run (saved Gaussians along the
+# recorded trajectory). Same per-machine bootstrap as gssg-run (conda env via .env.local),
+# no ROS needed.
+#
+#   ./bin/gssg-render output/replica_room0
+#   ./bin/gssg-render replica_room0 --fps 30 --speed 2.0 --depth
+#   ./bin/gssg-render replica_room0 --width 1280 --height 720 --fx 640 --fy 640   # older runs
+#
+# See `./bin/gssg-render --help` for all flags.
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$REPO_ROOT"
+[[ -f "$REPO_ROOT/.env.local" ]] && source "$REPO_ROOT/.env.local"
+
+log() { printf '\033[36m[gssg-render]\033[0m %s\n' "$*" >&2; }
+die() { printf '\033[31m[gssg-render] error:\033[0m %s\n' "$*" >&2; exit 1; }
+
+if [[ -n "${GSSG_CONDA_ENV:-}" && "${CONDA_DEFAULT_ENV:-}" != "$GSSG_CONDA_ENV" ]]; then
+  sh="${GSSG_CONDA_SH:-}"
+  [[ -z "$sh" ]] && command -v conda >/dev/null && sh="$(conda info --base)/etc/profile.d/conda.sh"
+  [[ -f "$sh" ]] || die "GSSG_CONDA_ENV=$GSSG_CONDA_ENV set but conda not found (set GSSG_CONDA_SH in .env.local)"
+  set +u
+  # shellcheck disable=SC1090
+  source "$sh"
+  conda activate "$GSSG_CONDA_ENV"
+  set -u
+  log "conda env: $GSSG_CONDA_ENV"
+fi
+
+export PYTHONPATH="$REPO_ROOT:${PYTHONPATH:-}"
+python -c "import importlib.util,sys; sys.exit(0 if importlib.util.find_spec('gssg') else 1)" 2>/dev/null \
+  || die "cannot import gssg from $REPO_ROOT (is the right conda env active?)"
+
+exec python -m gssg.cli.render_video "$@"

@@ -1,0 +1,3 @@
+parent: configs/datasets/hm3d.yaml
+source_path: data/hm3d/00824
+save_path: output/00824

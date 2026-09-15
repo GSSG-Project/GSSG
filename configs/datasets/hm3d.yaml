@@ -1,0 +1,7 @@
+parent: configs/quality/mid.yaml
+dataset_type: "hm3d"
+vertical_axis: 1               # Y-up
+max_depth: 10.0
+
+source_path: data/hm3d/00824
+save_path: output/hm3d_00824

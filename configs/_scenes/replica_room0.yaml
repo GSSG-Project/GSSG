@@ -1,0 +1,3 @@
+parent: configs/datasets/replica.yaml
+source_path: data/replica/room0
+save_path: output/room0

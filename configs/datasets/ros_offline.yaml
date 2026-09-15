@@ -1,0 +1,9 @@
+# Offline replay of a ROS-recorded scene from disk (results/frame*.jpg +
+# results/depth*.png + traj.txt + cam_params.json). Poses are flipped OpenGL->OpenCV;
+# set apply_view_transform: False if the recorder already wrote OpenCV c2w.
+parent: configs/quality/low.yaml
+dataset_type: "ros-offline"
+vertical_axis: 2
+
+source_path: "data/ros-offline/house"
+save_path: "output/ros_offline"

@@ -1,0 +1,73 @@
+# Jetson Thor (aarch64 / JetPack 7.x, Ubuntu 24.04, CUDA 13.x, sm_110) conda environment.
+#
+# Unlike the AGX Orin (environment-jetson.yaml, custom NVIDIA torch wheel), Thor is
+# SBSA-compatible: the standard PyTorch cu130 aarch64 wheels from download.pytorch.org
+# work directly — no hand-installed torch, no torchvision source build. The cu130 wheels
+# ship sm_110 kernels natively (verify: torch.cuda.get_arch_list()).
+#
+# Python is 3.11 (not 3.12 like environment-cuda13.yaml) because open3d's newest
+# aarch64 wheel is 0.18.0/cp311. open3d 0.18 is a numpy-1.x binary, so the scientific
+# stack keeps the same numpy-1-era pins as the Orin env. If open3d ever ships a
+# numpy-2 aarch64 wheel, this file can move to py3.12 + unpinned numpy.
+#
+# After `conda env create`, install the editable thirdparty packages exactly as in the
+# standard setup (README), with TORCH_CUDA_ARCH_LIST="11.0" exported for the
+# CUDA extension builds. Note: `pip install -e thirdparty/sam3/` downgrades numpy to
+# 1.26.0 — finish with `pip install numpy==1.26.4` (same as the standard setup).
+name: gssg
+channels:
+  - conda-forge
+dependencies:
+  - cuda-toolkit=13.2     # linux-aarch64 build; nvcc 13.2 targets Thor (sm_110)
+  - gxx_linux-aarch64=13  # host compiler for nvcc
+  - cmake
+  - make
+  - ninja
+  - pkg-config
+  - glm                   # gaussian-rasterizer needs glm/glm.hpp
+  - python=3.11
+  - pip
+  - tqdm
+
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu130
+      - torch==2.10.0
+      - torchvision==0.25.0
+      # numpy-1.x ABI stack (see header comment; same reasoning as environment-jetson.yaml)
+      - numpy==1.26.4
+      - scipy==1.11.4
+      - opencv-python==4.9.0.80
+      - faiss-cpu==1.8.0.post1
+      - shapely==2.0.1
+      - open3d==0.18.0
+      - setuptools<81       # sam3 imports pkg_resources, removed in setuptools 81
+      - tensorboard
+      - einops
+      - matplotlib
+      - pycocotools
+      - psutil
+      - pytorch_msssim
+      - trimesh
+      - scikit-image
+      - pyyaml
+      - GPUtil
+      - Pillow
+      - plyfile
+      - rtree
+      - ultralytics
+      - rerun-sdk
+      - torchmetrics
+      - fastapi
+      - langchain
+      - langchain-google-genai
+      # BestSAM backend (seg_model: "bestsam") — TensorRT engine build + runtime.
+      # transformers>=5 (Sam3Model) arrives via `pip install -e thirdparty/mobileclip/`.
+      - tensorrt-cu13==10.16.1.11
+      - onnx
+      - onnx-graphsurgeon   # build_engine.py's If-node sanitize step
+      - accelerate
+      # huggingface-hub: intentionally unpinned — mobileclip's deps (transformers 5.x)
+      #   require hub >= 1.x; the Orin-era 0.36 pin does not apply on this stack.
+      # torchaudio: unused by GSSG — skip
+      # decord: no aarch64 wheel — sam3 is pinned past the upstream lazy-decord fix
+      #   (86ed770), so image-mode inference never imports it.

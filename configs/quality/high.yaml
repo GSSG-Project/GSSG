@@ -1,0 +1,29 @@
+# Best quality (equivalent to the old high-base.yaml behavior).
+parent: configs/base.yaml
+
+sampling_version: 1
+uniform_sample_num: 10000
+gaussian_update_iter: 100
+gaussian_update_frame: 2
+seed_filter_mode: "grid"        # voxel-hash seed filter ("knn" = legacy pytorch3d, ~10-30x slower)
+adaptive_optimize: False       # full budget every frame (offline quality)
+adaptive_min_iter_ratio: 0.4
+memory_length: 5
+stable_confidence_thres: 100
+unstable_time_window: 120
+active_sh_degree: 0
+final_global_iter: 100
+keyframe_trans_thres: 0.01      # m
+keyframe_theta_thres: 1.0       # RADIANS
+scale_factor: 1.0
+max_radius: 0.01
+opacity_lr: 0.01
+color_weight: 0.6
+ssim_weight: 0.5
+add_depth_thres: 0.05
+add_color_thres: 0.05
+seg_model: "sam3"
+clip_model: "ViT-H-14"
+clip_mask_blur: False
+visualize: False
+verbose: True

@@ -1,0 +1,16 @@
+# Generic ROS 2 live stream — copy and set topics/frames for your robot.
+# Intrinsics come from camera_info. Stop: ros2 topic pub --once /gssg/stop std_msgs/msg/Empty '{}'
+parent: configs/quality/live.yaml
+dataset_type: "ros2"
+vertical_axis: 2
+
+ros2_color_topic: "/camera/color/image_raw"
+ros2_depth_topic: "/camera/aligned_depth_to_color/image_raw"
+ros2_camera_info_topic: "/camera/color/camera_info"
+ros2_pose_topic: "/odom"
+ros2_world_frame: "odom"
+ros2_camera_frame: "camera_color_optical_frame"
+ros2_pose_cov_max: 0.0
+
+source_path: "live/ros2_online"
+save_path: "output/ros2_online"

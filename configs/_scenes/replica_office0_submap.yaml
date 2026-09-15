@@ -1,0 +1,22 @@
+# Example: Tier-3 submapping (out-of-core stable-cloud eviction) on Replica office0.
+#
+# Submapping bounds GPU memory to the local working set: stable Gaussians in cells
+# beyond `submap_radius` of the current cameras are evicted (host RAM / disk) and
+# paged back on approach. Toggle with `submapping` — off = exact monolithic behaviour.
+#
+# Eviction is opt-in via `submap_evict`; without it submapping stays all-resident
+# (partition metadata still tracked). For the online loop to stay output-equivalent,
+# submap_radius must be >= max_depth (default 0 = auto = max_depth+cell).
+#
+#   python gssg/run.py    --config configs/_scenes/replica_office0_submap.yaml
+#   python gssg/run_mp.py --config configs/_scenes/replica_office0_submap.yaml
+parent: configs/datasets/replica.yaml
+source_path: data/replica/office0
+save_path: output/office0_submap
+
+submapping: true
+# submap_evict: true           # opt in to out-of-core eviction (object geometry via §3.4 index)
+submap_cell_size: 4.0          # m, ground-plane cell edge (sized so a cell fits the GPU)
+submap_radius: 0.0             # 0 = auto (max_depth + cell_size); must be >= max_depth
+submap_evict_tier: "host"      # "host" (pinned CPU) | "disk" (compressed-later torch.save)
+# submap_page_dir: "/tmp/gssg_pages"   # required for the disk tier; keep outside save_path

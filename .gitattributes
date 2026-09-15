@@ -1,0 +1,17 @@
+* text=auto eol=lf
+
+*.py   text
+*.yaml text
+*.yml  text
+*.md   text
+
+*.png  binary
+*.jpg  binary
+*.ply  binary
+*.splat binary
+*.pt   binary
+*.pth  binary
+*.index binary
+*.pkl  binary
+*.plan binary
+*.gz   binary

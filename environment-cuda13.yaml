@@ -1,0 +1,49 @@
+name: gssg
+channels:
+  - nvidia/label/cuda-13.2.0
+  - conda-forge
+  - defaults
+dependencies:
+  - cuda-toolkit=13.2
+  - gxx_linux-64=12.3
+  - cmake
+  - make
+  - ninja
+  - pkg-config
+  - python=3.12
+  - pip
+
+  - numpy
+  - tqdm
+
+  - pip:
+      - --extra-index-url https://download.pytorch.org/whl/cu130
+      - torch==2.9.0
+      - torchvision==0.24.0
+      - torchaudio==2.9.0
+      - tensorboard
+      - einops
+      - decord
+      - matplotlib
+      - opencv-python
+      - pycocotools
+      - psutil
+      - pytorch_msssim
+      - trimesh
+      - scikit-image
+      - open3d
+      - pyyaml
+      - scipy
+      - GPUtil
+      - Pillow
+      - plyfile
+      - huggingface-hub==0.36.0
+      - rtree
+      - faiss-cpu
+      - ultralytics
+      - rerun-sdk
+      - torchmetrics
+      - shapely
+      - fastapi
+      - langchain
+      - langchain-google-genai

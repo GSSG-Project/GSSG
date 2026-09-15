@@ -1,0 +1,26 @@
+# Real-time live-stream preset: capped per-frame optimize + out-of-core submapping.
+parent: configs/quality/mid.yaml
+
+gaussian_update_iter: 10
+optimize_budget_ms: 250        # hard per-frame optimize cap (0 = off)
+uniform_sample_num: 2500
+opacity_lr: 0.01
+global_keyframe_num: 6
+max_sh_degree: 0               # DC-only -> ~3x smaller active footprint
+keyframe_theta_thres: 0.10     # RADIANS
+keyframe_trans_thres: 0.10
+keyframe_theta_thres_global: 0.30
+keyframe_trans_thres_global: 0.30
+stable_confidence_thres: 8
+unstable_time_window: 80
+save_step: 500
+visualize: False
+
+submapping: True
+submap_cell_size: 2.0
+submap_evict_tier: "hybrid"    # resident GPU -> host RAM -> disk
+submap_evict: True
+submap_verify_every: 0
+submap_active_max: 800000
+commit_on_leave: True
+submap_final_pass: per_cell

@@ -1,0 +1,13 @@
+# Handheld ZED capture (poses already optical/OpenCV).
+parent: configs/quality/high.yaml
+dataset_type: "realworld"
+apply_view_transform: False
+min_depth: 0.1
+max_depth: 9.8
+depth_filter: True
+filter_blur: True
+frame_step: 50
+use_keyframe: False
+
+source_path: data/realworld/meeting_room
+save_path: output/meeting_room

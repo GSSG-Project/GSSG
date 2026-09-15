@@ -1,0 +1,5 @@
+parent: configs/quality/mid.yaml
+dataset_type: "replica"
+
+source_path: data/replica/room1
+save_path: output/replica_room1

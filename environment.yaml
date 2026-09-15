@@ -1,0 +1,41 @@
+name: gssg
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - gxx_linux-aarch64
+  - cmake
+  - make
+  - ninja
+  - pkg-config
+  - python=3.10
+  - pip
+
+  - numpy
+  - tqdm
+
+  - pip:
+      - tensorboard
+      - einops
+      - matplotlib
+      - opencv-python
+      - pycocotools
+      - psutil
+      - pytorch_msssim
+      - trimesh
+      - scikit-image
+      - pyyaml
+      - scipy
+      - GPUtil
+      - Pillow
+      - plyfile
+      - huggingface-hub==0.36.0
+      - rtree
+      - faiss-cpu
+      - ultralytics
+      - rerun-sdk
+      - torchmetrics
+      - shapely
+      - fastapi
+      - langchain
+      - langchain-google-genai
